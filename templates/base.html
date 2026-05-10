@@ -50,23 +50,15 @@
         <!-- Mobile top navbar -->
         <nav class="mobile-navbar d-lg-none">
             <button class="mobile-menu-btn" id="sidebarToggle" aria-label="Меню">
-                <i class="bi bi-list"></i>
+                <i class="bi bi-list fs-4"></i>
             </button>
             <a href="{% url 'skill_list' %}" class="mobile-navbar-brand">
                 <img src="{% static 'images/logo_graph.svg' %}" alt="Aurora Logo" style="width: 28px; height: auto;">
                 <span class="fw-bold ms-2">Aurora</span>
             </a>
-            <div class="mobile-navbar-actions">
-                <a href="{% url 'skill_create' %}" class="mobile-action-btn" title="Нова навичка">
-                    <i class="bi bi-plus-lg"></i>
-                </a>
-                <a href="{% url 'profile' %}" class="mobile-avatar">
-                    {% if user.profile.avatar %}
-                        <img src="{{ user.profile.avatar.url }}" alt="" onerror="this.style.display='none'">
-                    {% endif %}
-                    <span class="mobile-avatar-letter">{{ user.username.0|upper }}</span>
-                </a>
-            </div>
+            <a href="{% url 'skill_create' %}" class="mobile-action-btn" title="Нова навичка">
+                <i class="bi bi-plus-lg"></i>
+            </a>
         </nav>
 
         <!-- Sidebar overlay for mobile -->
