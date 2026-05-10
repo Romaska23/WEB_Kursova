@@ -13,6 +13,10 @@ GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
+CSRF_TRUSTED_ORIGINS = [
+    f'https://{host}' for host in ALLOWED_HOSTS if host not in ('localhost', '127.0.0.1')
+] + ['http://localhost:8000', 'http://127.0.0.1:8000']
+
 #Video embending fix
 
 SECURE_REFERRER_POLICY = 'no-referrer-when-downgrade'
