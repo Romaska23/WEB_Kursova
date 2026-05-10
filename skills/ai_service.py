@@ -49,7 +49,7 @@ def generate_roadmap(topic):
         """
 
     try:
-        response = client.models.generate_content(model='gemini-2.5-flash', contents=prompt)
+        response = client.models.generate_content(model='gemini-3.0-flash-preview', contents=prompt)
         text = response.text
         text = re.sub(r'```json\n?|```', '', text).strip()
         data = json.loads(text)
