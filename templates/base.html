@@ -49,13 +49,24 @@
         {% if user.is_authenticated %}
         <!-- Mobile top navbar -->
         <nav class="mobile-navbar d-lg-none">
-            <a href="{% url 'skill_list' %}" class="mobile-navbar-brand">
-                <img src="{% static 'images/logo_graph.svg' %}" alt="Aurora Logo" style="width: 32px; height: auto;">
-                <span class="fw-bold ms-2">Aurora</span>
-            </a>
             <button class="mobile-menu-btn" id="sidebarToggle" aria-label="Меню">
                 <i class="bi bi-list"></i>
             </button>
+            <a href="{% url 'skill_list' %}" class="mobile-navbar-brand">
+                <img src="{% static 'images/logo_graph.svg' %}" alt="Aurora Logo" style="width: 28px; height: auto;">
+                <span class="fw-bold ms-2">Aurora</span>
+            </a>
+            <div class="mobile-navbar-actions">
+                <a href="{% url 'skill_create' %}" class="mobile-action-btn" title="Нова навичка">
+                    <i class="bi bi-plus-lg"></i>
+                </a>
+                <a href="{% url 'profile' %}" class="mobile-avatar">
+                    {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" alt="" onerror="this.style.display='none'">
+                    {% endif %}
+                    <span class="mobile-avatar-letter">{{ user.username.0|upper }}</span>
+                </a>
+            </div>
         </nav>
 
         <!-- Sidebar overlay for mobile -->
@@ -110,33 +121,21 @@
 
             {% if user.is_authenticated %}
             <header class="top-bar">
-
                 <div class="d-flex align-items-center w-100 justify-content-end">
-
                     <a href="{% url 'skill_create' %}" class="btn btn-sm me-4 text-white shadow-sm"
                        style="background: var(--aurora-gradient-primary); border:none; border-radius: 8px; font-weight: 600; padding: 8px 16px;">
                         + Нова навичка
                     </a>
-
                     <a href="{% url 'profile' %}" class="d-flex align-items-center text-decoration-none">
-
                          <div class="position-relative shadow-sm rounded-circle" style="width: 40px; height: 40px;">
-
                             <div class="position-absolute top-0 start-0 w-100 h-100 bg-secondary d-flex align-items-center justify-content-center text-white fw-bold border border-2 border-info rounded-circle"
-                                 style="font-size: 1.2rem; z-index: 1;">
-                                {{ user.username.0|upper }}
-                            </div>
-
+                                 style="font-size: 1.2rem; z-index: 1;">{{ user.username.0|upper }}</div>
                             {% if user.profile.avatar %}
-                                <img src="{{ user.profile.avatar.url }}"
-                                     alt=""
+                                <img src="{{ user.profile.avatar.url }}" alt=""
                                      class="position-absolute top-0 start-0 w-100 h-100 rounded-circle border border-2 border-info"
-                                     style="object-fit: cover; z-index: 2;"
-                                     onerror="this.style.display='none'">
-                                     {% endif %}
-
+                                     style="object-fit: cover; z-index: 2;" onerror="this.style.display='none'">
+                            {% endif %}
                          </div>
-
                          <span class="ms-3 fw-bold text-white" style="font-size: 0.95rem;">{{ user.username }}</span>
                     </a>
                 </div>
