@@ -1,0 +1,39 @@
+<button id="floating-theme-toggle" class="btn theme-toggle-floating" onclick="toggleThemeFloating()" aria-label="Змінити тему">
+    <i id="theme-icon-floating" class="fas fa-moon"></i>
+</button>
+
+<script>
+    (function initTheme() {
+        const savedTheme = localStorage.getItem('aurora-theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.body.classList.add('dark-theme');
+        }
+    })();
+
+    function toggleThemeFloating() {
+        const body = document.body;
+        const icon = document.getElementById('theme-icon-floating');
+
+        body.classList.toggle('dark-theme');
+
+        if (body.classList.contains('dark-theme')) {
+            localStorage.setItem('aurora-theme', 'dark');
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+        } else {
+            localStorage.setItem('aurora-theme', 'light');
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const icon = document.getElementById('theme-icon-floating');
+        if (document.body.classList.contains('dark-theme')) {
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+        }
+    });
+</script>
