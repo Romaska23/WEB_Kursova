@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load markdown_extras %}
+
+{% block title %}{{ skill.title }} | Aurora{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{% url 'skill_list' %}" class="btn btn-outline-secondary btn-sm">← Повернутися до списку</a>
+
+        <div class="btn-group">
+            <a href="{% url 'skill_edit' skill.slug %}" class="btn btn-outline-primary btn-sm">
+                ✏️ Редагувати
+            </a>
+            <a href="{% url 'skill_delete' skill.slug %}" class="btn btn-outline-danger btn-sm">
+                🗑️ Видалити
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <span class="badge bg-secondary mb-2">{{ skill.get_difficulty_display }}</span>
+                            <h1 class="text-primary fw-bold mb-1">{{ skill.title }}</h1>
+                            <p class="text-muted small">Категорія: {{ skill.category }}</p>
+                        </div>
+                        {% if skill.my_status == 'done' %}
+                            <span class="badge bg-success fs-6">✅ Вивчено</span>
+                        {% endif %}
+                    </div>
+
+                    {% if skill.get_video_id %}
+                        <div class="ratio ratio-16x9 mb-4 shadow-sm rounded overflow-hidden bg-dark">
+                            <iframe
+                                src="https://www.youtube-nocookie.com/embed/{{ skill.get_video_id }}?rel=0"
+                                title="Video"
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                    {% else %}
+                        <div class="mb-4 text-center p-4 bg-light rounded border border-dashed">
+                            <p class="text-muted mb-2">Відео ще не додано.</p>
+                            <a href="https://www.youtube.com/results?search_query={{ skill.title }} tutorial"
+                               target="_blank"
+                               class="btn btn-outline-danger btn-sm">
+                                🎬 Знайти на YouTube
+                            </a>
+                        </div>
+                    {% endif %}
+
+                    <hr>
+
+                    <div class="content-area py-2">
+                        {% if skill.description %}
+                            {{ skill.description|markdown }}
+                        {% else %}
+                            <div class="alert alert-light text-center text-muted border">
+                                Опис для цієї навички ще не додано.
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white fw-bold border-bottom">
+                    🕸️ Візуалізація
+                </div>
+                <div class="card-body text-center bg-light p-2">
+                    <pre class="mermaid" style="background: none; margin: 0;">
+                        {{ mermaid_graph|safe }}
+                    </pre>
+                    <small class="text-muted d-block mt-2 border-top pt-2">
+                        <span class="badge bg-success opacity-50">Вивчено</span>
+                        <span class="badge bg-warning text-dark opacity-50">В процесі</span>
+                        <span class="badge bg-primary">Ви тут</span>
+                    </small>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4 sticky-top" style="top: 80px; z-index: 1;">
+                <div class="card-header bg-white fw-bold border-bottom">
+                    Ваш прогрес
+                </div>
+                <div class="card-body text-center">
+                    {% if user.is_authenticated %}
+
+                        <div class="mb-4">
+                            {% if skill.my_status == 'done' %}
+                                <h2 class="text-success">🎉 Вивчено</h2>
+                                <p class="text-muted small">Чудова робота!</p>
+                            {% elif skill.my_status == 'in_progress' %}
+                                <h2 class="text-warning">🔥 В процесі</h2>
+                                <p class="text-muted small">Не зупиняйся!</p>
+                            {% elif skill.is_locked %}
+                                <h2 class="text-secondary">🔒 Закрито</h2>
+                                <p class="text-danger small">Спочатку вивчи попередні теми</p>
+                            {% else %}
+                                <h2 class="text-muted">⚪ Нова тема</h2>
+                                <p class="text-muted small">Готовий почати?</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            {% if skill.my_status == 'todo' %}
+                                {% if skill.is_locked %}
+                                    <button class="btn btn-secondary disabled" disabled>Вимоги не виконані</button>
+                                {% else %}
+                                    <a href="{% url 'change_status' skill.slug 'in_progress' %}" class="btn btn-primary btn-lg shadow-sm">🚀 Почати навчання</a>
+                                {% endif %}
+                            {% elif skill.my_status == 'in_progress' %}
+                                <a href="{% url 'change_status' skill.slug 'done' %}" class="btn btn-success btn-lg shadow-sm">✅ Завершити</a>
+                            {% elif skill.my_status == 'done' %}
+                                <a href="{% url 'change_status' skill.slug 'todo' %}" class="btn btn-outline-secondary btn-sm">Скинути прогрес</a>
+                            {% endif %}
+                        </div>
+
+                    {% else %}
+                        <p class="mb-3">Увійдіть, щоб зберігати свій прогрес навчання.</p>
+                        <a href="{% url 'login' %}" class="btn btn-primary w-100">Увійти в акаунт</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-bold border-bottom">
+                    Карта знань
+                </div>
+                <ul class="list-group list-group-flush small">
+                    <li class="list-group-item bg-light d-flex justify-content-between align-items-center">
+                        <span class="text-muted fw-bold">Попередні вимоги:</span>
+                        <a href="{% url 'add_dependency' skill.slug %}" class="btn btn-sm btn-outline-primary py-0" style="font-size: 0.8rem;">
+                            + Додати
+                        </a>
+                    </li>
+
+                    {% if skill.requires.all %}
+                        {% for req in skill.requires.all %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <a href="{% url 'skill_detail' req.from_skill.slug %}" class="text-decoration-none">
+                                        {{ req.from_skill.title }}
+                                    </a>
+                                    {% if req.dependency_type == 'hard' %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-1" style="font-size: 0.65rem;">Required</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-dark border ms-1" style="font-size: 0.65rem;">Soft</span>
+                                    {% endif %}
+                                </div>
+
+                                <form action="{% url 'remove_dependency' skill.slug req.id %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-link text-danger p-0 ms-2" style="text-decoration: none;" title="Видалити зв'язок" onclick="return confirm('Видалити цей зв\'язок?')">
+                                        &times;
+                                    </button>
+                                </form>
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="list-group-item text-muted fst-italic text-center py-3">
+                            Немає вимог. Цю навичку можна вчити першою!
+                        </li>
+                    {% endif %}
+
+                    {% if skill.required_by.all %}
+                        <li class="list-group-item bg-light text-muted fw-bold mt-2">Відкриває доступ до:</li>
+                        {% for req in skill.required_by.all %}
+                            <li class="list-group-item">
+                                <a href="{% url 'skill_detail' req.to_skill.slug %}" class="text-decoration-none">
+                                    {{ req.to_skill.title }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

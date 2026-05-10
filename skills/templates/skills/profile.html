@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Мій Профіль | Aurora{% endblock %}
+
+{% block content %}
+
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <div class="position-relative" style="width: 100px; height: 100px;">
+
+                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white border border-3 border-white shadow-sm position-absolute top-0 start-0 w-100 h-100"
+                             style="font-size: 3rem; font-weight: bold; z-index: 1;">
+                            {{ user.username|slice:":1"|upper }}
+                        </div>
+
+                        {% if user.profile.avatar %}
+                            <img src="{{ user.profile.avatar.url }}"
+                                 alt="Avatar"
+                                 class="rounded-circle border border-3 border-white shadow-sm position-absolute top-0 start-0 w-100 h-100"
+                                 style="object-fit: cover; z-index: 2;"
+                                 onerror="this.style.display='none'">
+                                 {% endif %}
+
+                    </div>
+                </div>
+
+                <div class="col">
+                    <h2 class="mb-1 text-primary fw-bold">{{ user.username }}</h2>
+
+                    <p class="text-muted mb-2 text-break" style="max-width: 600px;">
+                        {% if user.profile.bio %}
+                            {{ user.profile.bio }}
+                        {% else %}
+                            <em class="small text-muted">Опис профілю не заповнено. Розкажіть про себе!</em>
+                        {% endif %}
+                    </p>
+
+                    <div class="mb-0">
+                        {% if user.profile.github_link %}
+                            <a href="{{ user.profile.github_link }}" target="_blank" class="btn btn-sm btn-dark me-1 shadow-sm">
+                                <i class="bi bi-github"></i> GitHub
+                            </a>
+                        {% endif %}
+                        {% if user.profile.linkedin_link %}
+                            <a href="{{ user.profile.linkedin_link }}" target="_blank" class="btn btn-sm btn-primary me-1 shadow-sm">
+                                <i class="bi bi-linkedin"></i> LinkedIn
+                            </a>
+                        {% endif %}
+                        {% if user.profile.website_link %}
+                            <a href="{{ user.profile.website_link }}" target="_blank" class="btn btn-sm btn-outline-secondary shadow-sm">
+                                <i class="bi bi-globe"></i> Сайт
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-auto">
+                    <a href="{% url 'profile_edit' %}" class="btn btn-outline-secondary shadow-sm">
+                        <i class="bi bi-gear-fill"></i> Редагувати
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+
+        <div class="col-12 mb-4">
+            <div class="card shadow border-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-bold">Поточне звання</span>
+                            <h2 class="card-title text-primary mb-0 fw-bold">{{ rank.current_rank }}</h2>
+                        </div>
+                        <div class="text-end">
+                            <span class="text-muted small">Наступне звання</span>
+                            <div class="fw-bold">{{ rank.next_rank }}</div>
+                        </div>
+                    </div>
+
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                             role="progressbar"
+                             style="width: {{ rank.progress_percent|default:'0' }}%"
+                             aria-valuenow="{{ rank.progress_percent|default:'0' }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                             {{ rank.progress_percent }}%
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-2">
+                        <small class="text-muted">
+                            {% if rank.xp_needed > 0 %}
+                                Ще <strong>{{ rank.xp_needed }} XP</strong> до підвищення 🚀
+                            {% else %}
+                                Ви досягли вершини! 👑
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3 mb-md-0">
+            <div class="card text-white bg-primary shadow h-100">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
+                    <h5 class="card-title opacity-75">⚡ Загальний досвід (XP)</h5>
+                    <p class="display-4 fw-bold mb-0">{{ total_xp }}</p>
+                    <small class="opacity-75 mt-2">Бали за складність завдань</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card text-white bg-success shadow h-100">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
+                    <h5 class="card-title opacity-75">📚 Вивчено навичок</h5>
+                    <p class="display-4 fw-bold mb-0">{{ finished_count }}</p>
+                    <small class="opacity-75 mt-2">Так тримати!</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="border-bottom pb-2 mb-4 d-flex align-items-center">
+        🔥 Зараз в роботі
+        <span class="badge bg-secondary ms-2 fs-6 rounded-pill">{{ in_progress.count }}</span>
+    </h3>
+
+    <div class="row">
+        {% for item in in_progress %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 status-border-in_progress shadow-sm hover-shadow transition">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-light text-dark border">{{ item.skill.get_difficulty_display }}</span>
+                            <small class="text-muted">{{ item.skill.category }}</small>
+                        </div>
+
+                        <h5 class="card-title fw-bold mb-3">
+                            <a href="{% url 'skill_detail' item.skill.slug %}" class="text-decoration-none text-dark stretched-link">
+                                {{ item.skill.title }}
+                            </a>
+                        </h5>
+
+                        <div class="mt-auto">
+                            <div class="progress" style="height: 6px;">
+                              <div class="progress-bar bg-warning" role="progressbar" style="width: 50%"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <small class="text-muted">Статус:</small>
+                                <small class="fw-bold text-warning">В процесі...</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info d-flex align-items-center shadow-sm">
+                    <span class="fs-2 me-3">💤</span>
+                    <div>
+                        <h5 class="alert-heading mb-1">Ви зараз нічого не вчите</h5>
+                        <p class="mb-0">Саме час обрати нову ціль! <a href="{% url 'skill_list' %}" class="alert-link">Перейти до списку навичок</a>.</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
